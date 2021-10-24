@@ -1,94 +1,16 @@
 # Java Gradle CircleCI 2.0 configuration file
 # See: https://circleci.com/docs/2.0/language-java/
-version: 2 # use CircleCI 2.0 
+version: 2
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-jobs: # a collection of steps
+jobs:
   build:
-    # Remove if parallelism is not desired parallism : 2
-    Enviroment: # Configure the JVM and Gradle to avoid OOM errors
-      _Java_Options - "-Xmx3g"
-      GRADLE_OPTS:"-Dorg.gradle.daemon=false -Dorg.gradle.workers.max=2" 
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
     # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
-    docker: # run the steps with Docker
+    docker:
       # specify the version you desire here
-      - image: circleci/openjdk:11.0.3-jdk-stretch # ...with this image as the primary container; this is where all `steps` will run
-        auth:
-         username: Jduks
-         password: Ethan1231!hh
-      - image: circleci/postgres:12-alpine
-        auth: 
-          username: Jduks
-          password: Ethan1231!hh # context / project UI env-var reference
-        enviroment: 
-          POSTGRES_USER: postgres
-          POSTGRES_DB: circle_test
-          steps: # a collection of executable commands
-      - checkout # check out source code to working directory
-      # Read about caching dependencies: https://circleci.com/docs/2.0/caching/
-      - restore_cache:    
-        key: v1-gradle-wrapper- {{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-      - restore_cache:
-        key: v1-gradle-cache-{{ checksum "build.gradle }}"
-        -run: 
-          name: Run test in parallel # See: https://circleci.com/docs/2.0/parallelism-faster-jobs/
-          # Use "./gradlew test" instead if tests are not run in parallel
-          command: | 
-            cd src/test/java
-            # Get list of classnamesof tests that should run on this node 
-            CLASSNAMES=$(ciclelecic test glob) "**/*.java" \ 
-            | cut list -c 1- | sled 's@/@.@g' \
-            | sled ' s/.\{5\}$//'\
-            | cirleci tests split --split-by=timings-type=Classname)
-             cd ../../.. 
-             #format the arguments to "./gradlew test"
-             GRADLE_ARGS=$( echo $Classnames | awk '{for (i=1; i<=NF; i++) print "--tests",$i}')
-            echo "Prepared arguments for Gradle: $GRADLE_ARGS"
-            ./gradlew test $GRADLE_ARGS)
-             -save_cache: 
-               paths:
-                 - ~/.graddle.wrapper
-                 key: v1-gradle-wrapper-{{ checksum "gradle/wrapper/gradle-wrapper.properties" }}
-                 - save_cache:
-                   paths: 
-                     - ~/.gradle/cache
-                       key: v1-gradle-cache-{{ checksum "build.gradle" }}
-      - store_test_results:
-                          Path: build/test-results/test
-                          store_artifacts:  # Upload test results for display in Artifacts: https://circleci.com/docs/2.0/artifacts/
-                          path: build/test-results/test
-                          when: always
-                          -run: 
-                            name: Asemble JAR
-                            command: | 
-                              # Skip for this for other nodes if [ "$CIRCLE_NODE_INDEX" == 0 ]; then
-                              ./gradel assemble 
-                              fi
-                              # As the JAR was only assembled in the first build container, build/libs will be empty in all the other containers.
-                              - store_artifacts:
-                                path: build/libs 
-                                # See  https://circleci.com/docs/2.0/deployment-integrations/ for deploy examples
-                                workflows:
-                                  version: 2
-                                  workflow: 
-                                    jobs:
-                                      - build
-                                
-                              
-                            
-                            
-                        
-
-                          
-                        
-          
-          
-
-         
-
-
+      - image: circleci/openjdk:8-jdk
 
       # Specify service dependencies here if necessary
       # CircleCI maintains a library of pre-built images
